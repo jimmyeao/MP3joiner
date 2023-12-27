@@ -1,0 +1,19 @@
+﻿<Window x:Class="MP3Joiner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+        Title="MP3 Joiner" Height="450" Width="800">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button x:Name="btnAddFiles" Content="Add Files" Click="btnAddFiles_Click"/>
+            <Button x:Name="btnJoinFiles" Content="Join Files" Click="btnJoinFiles_Click"/>
+        </StackPanel>
+        <DataGrid AutoGenerateColumns="True"
+                  ItemsSource="{Binding fileList}"
+                  dd:DragDrop.IsDragSource="True"
+                  dd:DragDrop.IsDropTarget="True"
+                  dd:DragDrop.DropHandler="{Binding DropHandler}">
+            <!-- Other DataGrid properties -->
+        </DataGrid>
+    </DockPanel>
+</Window>
