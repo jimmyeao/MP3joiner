@@ -1,22 +1,35 @@
 ﻿// YourViewModel.cs
 using GongSolutions.Wpf.DragDrop;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 
 namespace MP3Joiner
 {
-    public class YourViewModel
+    public class YourViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<string> FileList { get; set; }
+        public ObservableCollection<FileInfo> FileList { get; } = new ObservableCollection<FileInfo>();
+       
         public YourDropHandler DropHandler { get; private set; }
 
         public YourViewModel()
         {
-            FileList = new ObservableCollection<string>();
+            
             DropHandler = new YourDropHandler(this);
         }
-    }
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+    }
+    public class FileInfo
+    {
+        public string FilePath { get; set; }
+        public string FileName => System.IO.Path.GetFileName(FilePath);
+    }
     public class YourDropHandler : IDropTarget
     {
         private readonly YourViewModel _viewModel;
@@ -34,20 +47,26 @@ namespace MP3Joiner
 
         public void Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is string && dropInfo.TargetItem is string)
+            if (dropInfo.Data is FileInfo && dropInfo.TargetItem is FileInfo)
             {
-                var droppedData = dropInfo.Data as string;
-                var targetData = dropInfo.TargetItem as string;
+                var droppedData = dropInfo.Data as FileInfo;
+                var targetData = dropInfo.TargetItem as FileInfo;
 
-                // Access FileList through the _viewModel reference
+                // Find the index of the target data in the file list
                 var index = _viewModel.FileList.IndexOf(targetData);
 
-                _viewModel.FileList.Remove(droppedData);
-                _viewModel.FileList.Insert(index, droppedData);
+                if (index != -1)
+                {
+                    // Remove the dropped data and insert it at the target index
+                    _viewModel.FileList.Remove(droppedData);
+                    _viewModel.FileList.Insert(index, droppedData);
+                }
             }
         }
+
     }
 }
+
 
 
 

@@ -1,19 +1,59 @@
 ﻿<Window x:Class="MP3Joiner.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:MP3Joiner"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        Title="MP3 Joiner" Height="450" Width="800">
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+        Title="MP3 Joiner" Height="450" Width="800"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+TextElement.FontWeight="Regular"
+TextElement.FontSize="13"
+TextOptions.TextFormattingMode="Ideal"
+TextOptions.TextRenderingMode="Auto"
+Background="{DynamicResource MaterialDesignPaper}"
+FontFamily="{DynamicResource MaterialDesignFont}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button x:Name="btnAddFiles" Content="Add Files" Click="btnAddFiles_Click"/>
             <Button x:Name="btnJoinFiles" Content="Join Files" Click="btnJoinFiles_Click"/>
         </StackPanel>
-        <DataGrid AutoGenerateColumns="True"
-                  ItemsSource="{Binding fileList}"
+
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False"
+                  ItemsSource="{Binding FileList}"
                   dd:DragDrop.IsDragSource="True"
                   dd:DragDrop.IsDropTarget="True"
                   dd:DragDrop.DropHandler="{Binding DropHandler}">
-            <!-- Other DataGrid properties -->
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Filename" Binding="{Binding FileName}" />
+            </DataGrid.Columns>
         </DataGrid>
-    </DockPanel>
+
+        <ProgressBar Grid.Row="2" x:Name="progressBar" Height="20" Margin="10"/>
+
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock x:Name="statusText" Text="Ready"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
 </Window>
