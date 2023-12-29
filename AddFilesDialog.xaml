@@ -3,20 +3,20 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:MP3Joiner"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Files" Height="200" Width="400"
+        Title="Add Files" Height="200" Width="400" Foreground="White"
         WindowStartupLocation="CenterOwner"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}"
+             Background="#0A4185"
         FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <materialDesign:BundledTheme BaseTheme="Light" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
@@ -27,7 +27,7 @@
     </Window.Resources>
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock Text="Do you want to add to the existing list or create a new list?" 
-                   Margin="10" TextAlignment="Center"/>
+                   Margin="10" TextAlignment="Center"  Foreground="White"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
             <Button x:Name="btnAdd" Content="Add to List" Margin="5" Click="btnAdd_Click"/>
             <Button x:Name="btnNewList" Content="New List" Margin="5" Click="btnNewList_Click"/>
