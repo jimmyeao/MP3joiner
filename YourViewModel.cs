@@ -6,38 +6,34 @@ using System.Windows;
 
 namespace MP3Joiner
 {
-    public class YourViewModel : INotifyPropertyChanged
-    {
-        public ObservableCollection<FileInfo> FileList { get; } = new ObservableCollection<FileInfo>();
-       
-        public YourDropHandler DropHandler { get; private set; }
-
-        public YourViewModel()
-        {
-            
-            DropHandler = new YourDropHandler(this);
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-    }
     public class FileInfo
     {
-        public string FilePath { get; set; }
+        #region Public Properties
+
         public string FileName => System.IO.Path.GetFileName(FilePath);
+        public string FilePath { get; set; }
+
+        #endregion Public Properties
     }
+
     public class YourDropHandler : IDropTarget
     {
+        #region Private Fields
+
         private readonly YourViewModel _viewModel;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public YourDropHandler(YourViewModel viewModel)
         {
             _viewModel = viewModel;
         }
+
+        #endregion Public Constructors
+
+        #region Public Methods
 
         public void DragOver(IDropInfo dropInfo)
         {
@@ -64,9 +60,40 @@ namespace MP3Joiner
             }
         }
 
+        #endregion Public Methods
+    }
+
+    public class YourViewModel : INotifyPropertyChanged
+    {
+        #region Public Constructors
+
+        public YourViewModel()
+        {
+            DropHandler = new YourDropHandler(this);
+        }
+
+        #endregion Public Constructors
+
+        #region Public Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Public Events
+
+        #region Public Properties
+
+        public YourDropHandler DropHandler { get; private set; }
+        public ObservableCollection<FileInfo> FileList { get; } = new ObservableCollection<FileInfo>();
+
+        #endregion Public Properties
+
+        #region Protected Methods
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Protected Methods
     }
 }
-
-
-
-

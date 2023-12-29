@@ -1,20 +1,24 @@
 ﻿using Microsoft.Win32;
+using MP3joiner;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using NAudio.Wave;
-using NAudio.Lame;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Windows;
 using System.Windows.Media.Animation;
-using MP3joiner;
 
 namespace MP3Joiner
 {
     public partial class MainWindow : Window
     {
+        #region Private Fields
+
         private BackgroundWorker worker = new BackgroundWorker();
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         public MainWindow()
@@ -32,20 +36,88 @@ namespace MP3Joiner
             }
 
             // Remove the other theme
-           
-
-           
         }
 
         #endregion Public Constructors
 
         #region Private Methods
+
+        private void AnimateProgressBarToZero()
+        {
+            var animation = new DoubleAnimation
+            {
+                From = progressBar.Value,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(1)
+            };
+            progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, animation);
+        }
+
+        private void btnAddFiles_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "MP3 Files|*.mp3"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var viewModel = DataContext as YourViewModel;
+                if (viewModel.FileList.Any())
+                {
+                    var dialog = new AddFilesDialog();
+                    dialog.Owner = this; // Set the main window as the owner
+                    dialog.ShowDialog();
+
+                    if (dialog.DialogResult == "NewList")
+                    {
+                        viewModel.FileList.Clear(); // Clears the existing list for a new list
+                    }
+                    else if (dialog.DialogResult == "Cancel")
+                    {
+                        return; // Cancel the operation
+                    }
+                }
+
+                foreach (string file in openFileDialog.FileNames)
+                {
+                    viewModel.FileList.Add(new FileInfo { FilePath = file });
+                }
+            }
+        }
+
+        private void btnJoinFiles_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "MP3 Files|*.mp3"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                var viewModel = DataContext as YourViewModel;
+                var mp3Files = viewModel.FileList.Select(f => f.FilePath).ToList();
+                var data = new { OutputFile = saveFileDialog.FileName, Mp3Files = mp3Files };
+                worker.RunWorkerAsync(data);
+            }
+        }
+
         private void SetupBackgroundWorker()
         {
             worker.WorkerReportsProgress = true;
             worker.DoWork += Worker_DoWork;
             worker.ProgressChanged += Worker_ProgressChanged;
         }
+
+        private void UpdateStatus(string message)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                statusText.Text = message;
+            });
+        }
+
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             var data = e.Argument as dynamic;
@@ -100,85 +172,12 @@ namespace MP3Joiner
                     completionDialog.Owner = this; // Set the main window as the owner
                     completionDialog.ShowDialog();
                 });
-
             }
         }
-
-
-        private void UpdateStatus(string message)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                statusText.Text = message;
-            });
-        }
-
-        private void AnimateProgressBarToZero()
-        {
-            var animation = new DoubleAnimation
-            {
-                From = progressBar.Value,
-                To = 0,
-                Duration = TimeSpan.FromSeconds(1)
-            };
-            progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, animation);
-        }
-
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressBar.Value = e.ProgressPercentage;
-        }
-        private void btnAddFiles_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Multiselect = true,
-                Filter = "MP3 Files|*.mp3"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                var viewModel = DataContext as YourViewModel;
-                if (viewModel.FileList.Any())
-                {
-                    var dialog = new AddFilesDialog();
-                    dialog.Owner = this; // Set the main window as the owner
-                    dialog.ShowDialog();
-
-                    if (dialog.DialogResult == "NewList")
-                    {
-                        viewModel.FileList.Clear(); // Clears the existing list for a new list
-                    }
-                    else if (dialog.DialogResult == "Cancel")
-                    {
-                        return; // Cancel the operation
-                    }
-                }
-
-                foreach (string file in openFileDialog.FileNames)
-                {
-                    viewModel.FileList.Add(new FileInfo { FilePath = file });
-                }
-            }
-        }
-
-
-
-        private void btnJoinFiles_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "MP3 Files|*.mp3"
-            };
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                var viewModel = DataContext as YourViewModel;
-                var mp3Files = viewModel.FileList.Select(f => f.FilePath).ToList();
-                var data = new { OutputFile = saveFileDialog.FileName, Mp3Files = mp3Files };
-                worker.RunWorkerAsync(data);
-            }
         }
 
         #endregion Private Methods

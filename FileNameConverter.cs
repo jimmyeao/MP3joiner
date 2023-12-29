@@ -8,6 +8,8 @@ namespace MP3joiner
     [ValueConversion(typeof(string), typeof(string))]
     public class FileNameConverter : IValueConverter
     {
+        #region Public Methods
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string fullPath = value as string;
@@ -18,5 +20,7 @@ namespace MP3joiner
         {
             throw new NotImplementedException();
         }
+
+        #endregion Public Methods
     }
 }
