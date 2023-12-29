@@ -6,6 +6,9 @@ using System.Windows;
 using NAudio.Wave;
 using NAudio.Lame;
 using System.ComponentModel;
+using System.IO;
+using System.Windows.Media.Animation;
+using MP3joiner;
 
 namespace MP3Joiner
 {
@@ -47,32 +50,60 @@ namespace MP3Joiner
         {
             var data = e.Argument as dynamic;
             string outputFile = data.OutputFile;
-            var mp3Files = data.Mp3Files;
 
-            int totalFiles = mp3Files.Count;
-            int processedFiles = 0;
-            UpdateStatus("Starting file join process...");
-            using (var writer = new LameMP3FileWriter(outputFile, new WaveFormat(44100, 2), LAMEPreset.STANDARD))
+            // Cast mp3Files to a specific type, for example, List<string>
+            var mp3Files = data.Mp3Files as List<string>;
+
+            if (mp3Files != null)
             {
-                foreach (string mp3File in mp3Files)
+                long totalBytes = mp3Files.Sum(file => new System.IO.FileInfo(file).Length);
+
+                long processedBytes = 0;
+
+                Dispatcher.Invoke(() => UpdateStatus("Starting file join process..."));
+
+                using (FileStream outputFs = new FileStream(outputFile, FileMode.Create))
                 {
-                    UpdateStatus("Working on " + mp3File.ToString());
-                    using (var reader = new Mp3FileReader(mp3File))
+                    foreach (string mp3File in mp3Files)
                     {
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        while ((bytesRead = reader.Read(buffer, 0, buffer.Length)) > 0)
+                        Dispatcher.Invoke(() => UpdateStatus($"Processing {mp3File}..."));
+
+                        using (Mp3FileReader reader = new Mp3FileReader(mp3File))
                         {
-                            writer.Write(buffer, 0, bytesRead);
+                            if ((outputFs.Position == 0) && (reader.Id3v2Tag != null))
+                            {
+                                outputFs.Write(reader.Id3v2Tag.RawData, 0, reader.Id3v2Tag.RawData.Length);
+                            }
+
+                            Mp3Frame frame;
+                            while ((frame = reader.ReadNextFrame()) != null)
+                            {
+                                outputFs.Write(frame.RawData, 0, frame.RawData.Length);
+                                processedBytes += frame.RawData.Length;
+
+                                int progressPercentage = (int)((double)processedBytes / totalBytes * 100);
+                                worker.ReportProgress(progressPercentage);
+                            }
                         }
                     }
-                    processedFiles++;
-                    int progressPercentage = (int)((double)processedFiles / totalFiles * 100);
-                    worker.ReportProgress(progressPercentage);
                 }
-                UpdateStatus("File written " + outputFile.ToString());
+
+                Dispatcher.Invoke(() => UpdateStatus($"Joining complete. Output file: {outputFile}"));
+
+                // Inside your background worker completion logic
+                Dispatcher.Invoke(() =>
+                {
+                    AnimateProgressBarToZero();
+                    UpdateStatus("Processing complete.");
+
+                    var completionDialog = new CompletionDialog();
+                    completionDialog.Owner = this; // Set the main window as the owner
+                    completionDialog.ShowDialog();
+                });
+
             }
         }
+
 
         private void UpdateStatus(string message)
         {
@@ -80,6 +111,17 @@ namespace MP3Joiner
             {
                 statusText.Text = message;
             });
+        }
+
+        private void AnimateProgressBarToZero()
+        {
+            var animation = new DoubleAnimation
+            {
+                From = progressBar.Value,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(1)
+            };
+            progressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, animation);
         }
 
 

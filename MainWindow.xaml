@@ -44,7 +44,7 @@ FontFamily="{DynamicResource MaterialDesignFont}">
                   dd:DragDrop.IsDropTarget="True"
                   dd:DragDrop.DropHandler="{Binding DropHandler}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Filename" Binding="{Binding FileName}" />
+                <DataGridTextColumn Header="Filename" Binding="{Binding FileName, Mode=OneWay}" />
             </DataGrid.Columns>
         </DataGrid>
 
