@@ -71,7 +71,8 @@ namespace MP3Joiner
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                HandleFileDrop(files);
+                var mp3Files = files.Where(file => System.IO.Path.GetExtension(file).Equals(".mp3", StringComparison.OrdinalIgnoreCase)).ToArray();
+                HandleFileDrop(mp3Files);
                 e.Handled = true; // Mark the event as handled
             }
             else
