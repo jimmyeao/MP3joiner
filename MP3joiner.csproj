@@ -5,8 +5,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.0.0.59</AssemblyVersion>
-    <FileVersion>1.0.0.59</FileVersion>
+    <AssemblyVersion>1.0.0.68</AssemblyVersion>
+    <FileVersion>1.0.0.68</FileVersion>
     <ApplicationIcon>logo (1).ico</ApplicationIcon>
     <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>

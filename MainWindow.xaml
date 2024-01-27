@@ -9,6 +9,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
+        
         Background="#0A4185"
         FontFamily="{DynamicResource MaterialDesignFont}">
 
@@ -70,16 +71,25 @@
                     <TextBlock Text="Join Files" Foreground="White"/>
                 </StackPanel>
             </Button>
+            <Button x:Name="btnclearList" Style="{StaticResource MaterialDesignFlatButton}" Foreground="White" Click="btnclearList_Click">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="BrushOff" Margin="0,0,5,0" Foreground="White"/>
+                    <TextBlock Text="Clear List" Foreground="White"/>
+                </StackPanel>
+            </Button>
 
         </StackPanel>
 
         <materialDesign:Card Grid.Row="1" Grid.Column="0" Margin="10,10,10,10" Grid.ColumnSpan="3">
             <DataGrid AutoGenerateColumns="False"
-          HeadersVisibility="Column"
-          ItemsSource="{Binding FileList}"
-          dd:DragDrop.IsDragSource="True"
-          dd:DragDrop.IsDropTarget="True"
-          dd:DragDrop.DropHandler="{Binding DropHandler}">
+            HeadersVisibility="Column"
+            AllowDrop="True"
+            Drop="Window_Drop"
+            DragEnter="Window_DragEnter"
+            ItemsSource="{Binding FileList}"
+            dd:DragDrop.IsDragSource="True"
+            dd:DragDrop.IsDropTarget="True"
+            dd:DragDrop.DropHandler="{Binding DropHandler}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Filename" Binding="{Binding FileName, Mode=OneWay}" Width="*"/>
                 </DataGrid.Columns>

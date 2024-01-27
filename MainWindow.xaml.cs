@@ -51,6 +51,84 @@ namespace MP3Joiner
         #endregion Public Constructors
 
         #region Private Methods
+        private void Window_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy; // Show copy cursor
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None; // Show no-entry cursor
+            }
+
+            e.Handled = true;
+        }
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            // Check if the drop is from an external source (Windows Explorer)
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                HandleFileDrop(files);
+                e.Handled = true; // Mark the event as handled
+            }
+            else
+            {
+                // If the drop is not from an external source, 
+                // it might be an internal drag-and-drop for reordering.
+                // Do not set e.Handled to true here.
+                // This allows GongSolutions.Wpf.DragDrop to handle internal reordering.
+            }
+        }
+
+
+        private void HandleFileDrop(string[] files)
+        {
+            var viewModel = DataContext as YourViewModel;
+            if (viewModel == null) return;
+            var firstadded = true;
+            // Your existing logic for handling file drops
+            foreach (string file in files)
+            {
+               
+                    // Add each file to your file list, for example:
+                    // Assuming 'fileList' is your ObservableCollection<string> that's bound to the UI
+                    if (viewModel.FileList.Any() && viewModel.FileList.All(f => f.FilePath != file) && firstadded == true)
+                    {
+                        // Create a new instance of AddFilesDialog
+                        var dialog = new AddFilesDialog();
+
+                        // Set the main window as the owner of the dialog
+                        dialog.Owner = this;
+
+                        // Show the dialog and wait for the user to close it
+                        dialog.ShowDialog();
+
+                        // Check the result of the dialog
+                        if (dialog.DialogResult == "NewList")
+                        {
+                            viewModel.FileList.Clear(); // Clear the existing list in the view model
+                            firstadded = false;
+                        }
+                        else if (dialog.DialogResult == "Cancel")
+                        {
+                            return; // Cancel the operation and return from the event handler
+                        }
+                    }
+                    viewModel.FileList.Add(new FileInfo { FilePath = file });
+                    firstadded = false;
+                
+            }
+        }
+
+      
+        private void btnclearList_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as YourViewModel;
+            viewModel.FileList.Clear();
+        }
 
         // This method is used to animate a progress bar to zero value
         private void AnimateProgressBarToZero()
