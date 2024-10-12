@@ -67,17 +67,7 @@
             <TextBlock Text="Artist Name:" Margin="0,10,0,0" />
             <TextBox x:Name="txtArtistName" Width="400" />
 
-            <TextBlock Text="Output File Name:" Margin="0,10,0,0" />
-            <TextBox x:Name="txtOutputFileName" Width="400" />
-
             <!-- Bitrate Selection -->
-            <TextBlock Text="Bitrate:" Margin="0,10,0,0" />
-            <ComboBox x:Name="cmbBitrate" Width="100" SelectedIndex="3">
-                <ComboBoxItem>128</ComboBoxItem>
-                <ComboBoxItem>192</ComboBoxItem>
-                <ComboBoxItem>256</ComboBoxItem>
-                <ComboBoxItem IsSelected="True">320</ComboBoxItem>
-            </ComboBox>
 
             <!-- Progress Bar -->
             <ProgressBar x:Name="progressBar" Height="20" Margin="0, 20, 0, 0" Minimum="0" Maximum="100" />

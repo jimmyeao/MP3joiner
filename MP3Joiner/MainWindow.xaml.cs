@@ -47,8 +47,15 @@ namespace MP3Joiner
         // Clear MP3 File List
         private void btnClearFiles_Click(object sender, RoutedEventArgs e)
         {
-            mp3FileList.Items.Clear();
+            mp3FileList.Items.Clear();  // Clear MP3 list
+            imgAlbumArt.Source = null;   // Clear album art image
+            AlbumArtPlaceholder.Visibility = Visibility.Visible;  // Show "Drop Image Here" text again
+            txtTrackName.Clear();        // Clear track name
+            txtArtistName.Clear();       // Clear artist name
+           
+            progressBar.Value = 0;       // Reset progress bar
         }
+
 
         // Handle Mouse Move to start drag operation for reordering
         private void mp3FileList_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -187,7 +194,7 @@ namespace MP3Joiner
             // Fetch metadata
             string artist = txtArtistName.Text;
             string trackName = txtTrackName.Text;
-            int bitrate = int.Parse(((ComboBoxItem)cmbBitrate.SelectedItem).Content.ToString());
+            
             BitmapImage albumArt = imgAlbumArt.Source as BitmapImage;
 
             // Use a SaveFileDialog to prompt for output file location
@@ -207,22 +214,28 @@ namespace MP3Joiner
 
                 try
                 {
-                    await JoinMP3FilesAsync(mp3Files, outputFileName, bitrate, artist, trackName, albumArt, ReportProgress);
+                    await JoinMP3FilesAsync(mp3Files, outputFileName, artist, trackName, albumArt, ReportProgress);
                     MessageBox.Show("MP3 files joined successfully.");
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error: {ex.Message}");
                 }
+                finally
+                {
+                    // Reset the progress bar after completion
+                    progressBar.Value = 0;
+                }
             }
         }
+
 
 
         private void ReportProgress(int progress)
         {
             Dispatcher.Invoke(() => { progressBar.Value = progress; });
         }
-        private void ApplyMetadata(string outputFile, string artist, string trackName, BitmapImage albumArt, int bitrate)
+        private void ApplyMetadata(string outputFile, string artist, string trackName, BitmapImage albumArt)
         {
             var tfile = TagLib.File.Create(outputFile);
             tfile.Tag.Performers = new[] { artist };
@@ -239,19 +252,25 @@ namespace MP3Joiner
                     tfile.Tag.Pictures = new[] { new TagLib.Picture(ms.ToArray()) };
                 }
             }
-
-            tfile.Save();
+            try
+            {
+                tfile.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error tagging MP3 file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         // Asynchronous method to join MP3 files
-        private async Task JoinMP3FilesAsync(string[] mp3Files, string outputFile, int bitrate, string artist, string trackName, BitmapImage albumArt, Action<int> reportProgress)
+        private async Task JoinMP3FilesAsync(string[] mp3Files, string outputFile, string artist, string trackName, BitmapImage albumArt, Action<int> reportProgress)
         {
             await Task.Run(() =>
             {
-                using (var outputStream = new MemoryStream())
-                {
-                    long totalBytes = mp3Files.Sum(file => new FileInfo(file).Length);
-                    long processedBytes = 0;
+                long totalBytes = mp3Files.Sum(file => new FileInfo(file).Length);
+                long processedBytes = 0;
 
+                using (var outputStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                {
                     foreach (var file in mp3Files)
                     {
                         using (var reader = new Mp3FileReader(file))
@@ -261,21 +280,16 @@ namespace MP3Joiner
                             {
                                 outputStream.Write(frame.RawData, 0, frame.RawData.Length);
                                 processedBytes += frame.RawData.Length;
+
                                 int progressPercentage = (int)((double)processedBytes / totalBytes * 100);
                                 reportProgress(progressPercentage);
                             }
                         }
                     }
-
-                    // Write the final output to a file
-                    using (var fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
-                    {
-                        outputStream.WriteTo(fileStream);
-                    }
-
-                    // Apply metadata
-                    ApplyMetadata(outputFile, artist, trackName, albumArt, bitrate);
                 }
+
+                // Apply metadata (this step happens only after all files are joined)
+                ApplyMetadata(outputFile, artist, trackName, albumArt);
             });
         }
 
