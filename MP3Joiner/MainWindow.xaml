@@ -1,0 +1,78 @@
+﻿<Window x:Class="MP3Joiner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MP3 Joiner" Height="600" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Buttons for adding files -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0, 0, 0, 10">
+            <Button x:Name="btnAddFiles" Width="120" Click="btnAddFiles_Click">Add MP3 Files</Button>
+            <Button x:Name="btnClearFiles" Width="120" Click="btnClearFiles_Click" Margin="10,0,0,0">Clear List</Button>
+        </StackPanel>
+
+        <!-- ListBox for MP3 Files -->
+        <ListBox x:Name="mp3FileList" Grid.Row="1" Grid.Column="0" AllowDrop="True"
+         PreviewMouseMove="mp3FileList_PreviewMouseMove" DragEnter="mp3FileList_DragEnter"
+         DragOver="mp3FileList_DragOver" Drop="mp3FileList_Drop">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+
+        <!-- Album Art Drop Area -->
+        <Border x:Name="AlbumArtBorder" Grid.Row="1" Grid.Column="1" Background="LightGray" BorderThickness="1" BorderBrush="Black"
+                Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" AllowDrop="True" 
+                DragEnter="AlbumArtBorder_DragEnter" Drop="AlbumArtBorder_Drop">
+
+            <!-- Grid to contain both Image and TextBlock -->
+            <Grid>
+                <!-- Image to display the album art -->
+                <Image x:Name="imgAlbumArt" Stretch="Uniform" Width="200" Height="200" />
+
+                <!-- TextBlock visible initially and hidden after image drop -->
+                <TextBlock x:Name="AlbumArtPlaceholder" Text="Drop Image Here" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="Black" Background="Transparent" Opacity="0.7" />
+            </Grid>
+        </Border>
+
+        <!-- Metadata inputs (Artist, Track, etc.) -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Vertical" Margin="0, 10, 0, 0">
+            <TextBlock Text="Track Name:" />
+            <TextBox x:Name="txtTrackName" Width="400" />
+
+            <TextBlock Text="Artist Name:" Margin="0,10,0,0" />
+            <TextBox x:Name="txtArtistName" Width="400" />
+
+            <TextBlock Text="Output File Name:" Margin="0,10,0,0" />
+            <TextBox x:Name="txtOutputFileName" Width="400" />
+
+            <!-- Bitrate Selection -->
+            <TextBlock Text="Bitrate:" Margin="0,10,0,0" />
+            <ComboBox x:Name="cmbBitrate" Width="100" SelectedIndex="3">
+                <ComboBoxItem>128</ComboBoxItem>
+                <ComboBoxItem>192</ComboBoxItem>
+                <ComboBoxItem>256</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">320</ComboBoxItem>
+                <!-- Default to 320 -->
+            </ComboBox>
+
+            <!-- Progress Bar -->
+            <ProgressBar x:Name="progressBar" Height="20" Margin="0, 20, 0, 0" Minimum="0" Maximum="100" />
+        </StackPanel>
+    </Grid>
+</Window>
