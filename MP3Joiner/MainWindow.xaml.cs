@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Linq;
 using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace MP3Joiner
 {
@@ -17,6 +17,7 @@ namespace MP3Joiner
             InitializeComponent();
         }
 
+        // Add MP3 Files
         private void btnAddFiles_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -37,6 +38,7 @@ namespace MP3Joiner
             }
         }
 
+        // Clear MP3 File List
         private void btnClearFiles_Click(object sender, RoutedEventArgs e)
         {
             mp3FileList.Items.Clear();

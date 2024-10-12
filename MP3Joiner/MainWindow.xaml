@@ -21,10 +21,12 @@
             <Button x:Name="btnClearFiles" Width="120" Click="btnClearFiles_Click" Margin="10,0,0,0">Clear List</Button>
         </StackPanel>
 
-        <!-- ListBox for MP3 Files -->
+        <!-- ListBox for MP3 Files with Drag and Drop Functionality -->
         <ListBox x:Name="mp3FileList" Grid.Row="1" Grid.Column="0" AllowDrop="True"
-         PreviewMouseMove="mp3FileList_PreviewMouseMove" DragEnter="mp3FileList_DragEnter"
-         DragOver="mp3FileList_DragOver" Drop="mp3FileList_Drop">
+                 PreviewMouseMove="mp3FileList_PreviewMouseMove" 
+                 DragEnter="mp3FileList_DragEnter"
+                 DragOver="mp3FileList_DragOver" 
+                 Drop="mp3FileList_Drop">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" />
@@ -32,18 +34,13 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-
-
         <!-- Album Art Drop Area -->
         <Border x:Name="AlbumArtBorder" Grid.Row="1" Grid.Column="1" Background="LightGray" BorderThickness="1" BorderBrush="Black"
-                Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" AllowDrop="True" 
+                Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" AllowDrop="True"
                 DragEnter="AlbumArtBorder_DragEnter" Drop="AlbumArtBorder_Drop">
-
-            <!-- Grid to contain both Image and TextBlock -->
             <Grid>
                 <!-- Image to display the album art -->
                 <Image x:Name="imgAlbumArt" Stretch="Uniform" Width="200" Height="200" />
-
                 <!-- TextBlock visible initially and hidden after image drop -->
                 <TextBlock x:Name="AlbumArtPlaceholder" Text="Drop Image Here" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="Black" Background="Transparent" Opacity="0.7" />
@@ -68,7 +65,6 @@
                 <ComboBoxItem>192</ComboBoxItem>
                 <ComboBoxItem>256</ComboBoxItem>
                 <ComboBoxItem IsSelected="True">320</ComboBoxItem>
-                <!-- Default to 320 -->
             </ComboBox>
 
             <!-- Progress Bar -->
