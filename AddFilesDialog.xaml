@@ -12,26 +12,14 @@
         TextOptions.TextRenderingMode="Auto"
              Background="#0A4185"
         FontFamily="{DynamicResource MaterialDesignFont}">
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Light" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
-
-        </ResourceDictionary>
-    </Window.Resources>
+  
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock Text="Do you want to add to the existing list or create a new list?" 
                    Margin="10" TextAlignment="Center"  Foreground="White"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-            <Button x:Name="btnAdd" Content="Add to List" Margin="5" Click="btnAdd_Click"/>
-            <Button x:Name="btnNewList" Content="New List" Margin="5" Click="btnNewList_Click"/>
-            <Button x:Name="btnCancel" Content="Cancel" Margin="5" Click="btnCancel_Click"/>
+            <Button x:Name="btnAdd" Content="Add to List" Margin="5" Click="btnAdd_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+            <Button x:Name="btnNewList" Content="New List" Margin="5" Click="btnNewList_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+            <Button x:Name="btnCancel" Content="Cancel" Margin="5" Click="btnCancel_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
         </StackPanel>
     </StackPanel>
 </Window>
