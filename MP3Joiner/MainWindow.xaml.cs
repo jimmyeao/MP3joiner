@@ -21,6 +21,7 @@ namespace MP3Joiner
         public MainWindow()
         {
             InitializeComponent();
+            SetDisplayIcon();
         }
 
         // Add MP3 Files
@@ -55,7 +56,40 @@ namespace MP3Joiner
            
             progressBar.Value = 0;       // Reset progress bar
         }
+        private static void SetDisplayIcon()
+        {
+            //only run in Release
 
+            try
+            {
+                // executable file
+                var exePath = Environment.ProcessPath;
+                if (!System.IO.File.Exists(exePath))
+                {
+                    return;
+                }
+
+                //DisplayIcon == "dfshim.dll,2" => 
+                var myUninstallKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+                string[]? mySubKeyNames = myUninstallKey?.GetSubKeyNames();
+                for (int i = 0; i < mySubKeyNames?.Length; i++)
+                {
+                    RegistryKey? myKey = myUninstallKey?.OpenSubKey(mySubKeyNames[i], true);
+                    // ClickOnce(Publish)
+                    // Publish -> Settings -> Options 
+                    // Publish Options -> Description -> Product name (is your DisplayName)
+                    var displayName = (string?)myKey?.GetValue("DisplayName");
+                    if (displayName?.Contains("YourApp") == true)
+                    {
+                        myKey?.SetValue("DisplayIcon", exePath + ",0");
+                        break;
+                    }
+                }
+                MP3Joiner.Properties.Settings.Default.IsFirstRun = false;
+                MP3Joiner.Properties.Settings.Default.Save();
+            }catch{ }
+            
+        }
 
         // Handle Mouse Move to start drag operation for reordering
         private void mp3FileList_PreviewMouseMove(object sender, MouseEventArgs e)
