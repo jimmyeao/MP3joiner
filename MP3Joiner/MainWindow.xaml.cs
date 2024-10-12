@@ -5,12 +5,18 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Linq;
+using System.Windows.Documents;
+using NAudio.Lame;
+using NAudio.Wave;
+using System.IO;
 
 namespace MP3Joiner
 {
     public partial class MainWindow : Window
     {
         private string _draggedItem;
+        private DropAdorner _dropAdorner;
+        private AdornerLayer _adornerLayer;
 
         public MainWindow()
         {
@@ -70,16 +76,214 @@ namespace MP3Joiner
             if (e.Data.GetDataPresent(DataFormats.FileDrop) || e.Data.GetDataPresent(DataFormats.StringFormat))
             {
                 e.Effects = DragDropEffects.Move;
+
+                var listBox = sender as ListBox;
+                var target = GetItemAtPosition(listBox, e.GetPosition(listBox));
+
+                // Remove the previous adorner if any
+                RemoveAdorner();
+
+                if (target != null)
+                {
+                    ListBoxItem container = listBox.ItemContainerGenerator.ContainerFromItem(target) as ListBoxItem;
+                    if (container != null)
+                    {
+                        _adornerLayer = AdornerLayer.GetAdornerLayer(container);
+
+                        // Determine whether to place the line above or below
+                        bool isAbove = e.GetPosition(container).Y < container.ActualHeight / 2;
+
+                        // Create and add the adorner
+                        _dropAdorner = new DropAdorner(container, isAbove);
+                        _adornerLayer.Add(_dropAdorner);
+                    }
+                }
             }
             else
             {
                 e.Effects = DragDropEffects.None;
+                RemoveAdorner();
             }
+        }
+
+        private void RemoveAdorner()
+        {
+            if (_dropAdorner != null && _adornerLayer != null)
+            {
+                _adornerLayer.Remove(_dropAdorner);
+                _dropAdorner = null;
+            }
+        }
+        private void JoinMP3Files(string[] mp3Files, string outputFile, int bitrate, string artist, string trackName, BitmapImage albumArt)
+        {
+            try
+            {
+                // Join MP3 files
+                using (var writer = new LameMP3FileWriter(outputFile, new WaveFormat(44100, 2), bitrate))
+                {
+                    foreach (string mp3File in mp3Files)
+                    {
+                        using (var reader = new Mp3FileReader(mp3File))
+                        {
+                            reader.CopyTo(writer);
+                        }
+                    }
+                }
+
+                // Tag the output file with metadata
+                TagOutputFile(outputFile, artist, trackName, albumArt);
+
+                MessageBox.Show("MP3 files combined successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error joining MP3 files: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Method to tag the MP3 file with metadata
+        private void TagOutputFile(string outputFile, string artist, string trackName, BitmapImage albumArt)
+        {
+            try
+            {
+                var tfile = TagLib.File.Create(outputFile);
+
+                tfile.Tag.Performers = new[] { artist };
+                tfile.Tag.Title = trackName;
+
+                if (albumArt != null)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // Convert BitmapImage to byte array
+                        var encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(BitmapFrame.Create(albumArt));
+                        encoder.Save(ms);
+
+                        tfile.Tag.Pictures = new[] { new TagLib.Picture(ms.ToArray()) };
+                    }
+                }
+
+                tfile.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error tagging MP3 file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Handler for the "Join Files" button click
+        private async void btnJoinFiles_Click(object sender, RoutedEventArgs e)
+        {
+            // Fetch MP3 files from the list
+            var mp3Files = mp3FileList.Items.Cast<string>().ToArray();
+
+            if (mp3Files.Length == 0)
+            {
+                MessageBox.Show("No MP3 files selected.");
+                return;
+            }
+
+            // Fetch metadata
+            string artist = txtArtistName.Text;
+            string trackName = txtTrackName.Text;
+            int bitrate = int.Parse(((ComboBoxItem)cmbBitrate.SelectedItem).Content.ToString());
+            BitmapImage albumArt = imgAlbumArt.Source as BitmapImage;
+
+            // Use a SaveFileDialog to prompt for output file location
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "MP3 Files (*.mp3)|*.mp3",
+                DefaultExt = "mp3",
+                Title = "Save Joined MP3 File"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string outputFileName = saveFileDialog.FileName;
+
+                // Reset progress bar
+                progressBar.Value = 0;
+
+                try
+                {
+                    await JoinMP3FilesAsync(mp3Files, outputFileName, bitrate, artist, trackName, albumArt, ReportProgress);
+                    MessageBox.Show("MP3 files joined successfully.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
+            }
+        }
+
+
+        private void ReportProgress(int progress)
+        {
+            Dispatcher.Invoke(() => { progressBar.Value = progress; });
+        }
+        private void ApplyMetadata(string outputFile, string artist, string trackName, BitmapImage albumArt, int bitrate)
+        {
+            var tfile = TagLib.File.Create(outputFile);
+            tfile.Tag.Performers = new[] { artist };
+            tfile.Tag.Title = trackName;
+
+            if (albumArt != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(albumArt));
+                    encoder.Save(ms);
+
+                    tfile.Tag.Pictures = new[] { new TagLib.Picture(ms.ToArray()) };
+                }
+            }
+
+            tfile.Save();
+        }
+        // Asynchronous method to join MP3 files
+        private async Task JoinMP3FilesAsync(string[] mp3Files, string outputFile, int bitrate, string artist, string trackName, BitmapImage albumArt, Action<int> reportProgress)
+        {
+            await Task.Run(() =>
+            {
+                using (var outputStream = new MemoryStream())
+                {
+                    long totalBytes = mp3Files.Sum(file => new FileInfo(file).Length);
+                    long processedBytes = 0;
+
+                    foreach (var file in mp3Files)
+                    {
+                        using (var reader = new Mp3FileReader(file))
+                        {
+                            Mp3Frame frame;
+                            while ((frame = reader.ReadNextFrame()) != null)
+                            {
+                                outputStream.Write(frame.RawData, 0, frame.RawData.Length);
+                                processedBytes += frame.RawData.Length;
+                                int progressPercentage = (int)((double)processedBytes / totalBytes * 100);
+                                reportProgress(progressPercentage);
+                            }
+                        }
+                    }
+
+                    // Write the final output to a file
+                    using (var fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                    {
+                        outputStream.WriteTo(fileStream);
+                    }
+
+                    // Apply metadata
+                    ApplyMetadata(outputFile, artist, trackName, albumArt, bitrate);
+                }
+            });
         }
 
         private void mp3FileList_Drop(object sender, DragEventArgs e)
         {
-            // Check if files are being dragged from external source (like Windows Explorer)
+            RemoveAdorner(); // Remove the adorner when the drop occurs
+
+            // Handle file drop
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -91,7 +295,8 @@ namespace MP3Joiner
                     }
                 }
             }
-            // Handle internal reordering
+
+            // Handle reordering of items within the list
             else if (e.Data.GetDataPresent(DataFormats.StringFormat))
             {
                 var listBox = sender as ListBox;
@@ -104,6 +309,7 @@ namespace MP3Joiner
                     int oldIndex = listBox.Items.IndexOf(draggedFile);
                     int newIndex = listBox.Items.IndexOf(target);
 
+                    // Remove from old position and insert in the new position
                     if (oldIndex != -1 && newIndex != -1)
                     {
                         listBox.Items.Remove(draggedFile);
@@ -114,6 +320,7 @@ namespace MP3Joiner
 
             e.Handled = true;
         }
+
 
         private string GetItemAtPosition(ListBox listBox, Point position)
         {

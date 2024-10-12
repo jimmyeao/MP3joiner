@@ -1,7 +1,16 @@
 ﻿<Window x:Class="MP3Joiner.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MP3 Joiner" Height="600" Width="800">
+        Title="MP3 Joiner" Height="600" Width="800"
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="12"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,10 +28,13 @@
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0, 0, 0, 10">
             <Button x:Name="btnAddFiles" Width="120" Click="btnAddFiles_Click">Add MP3 Files</Button>
             <Button x:Name="btnClearFiles" Width="120" Click="btnClearFiles_Click" Margin="10,0,0,0">Clear List</Button>
+            <!-- New button to join MP3 files -->
+            <Button x:Name="btnJoinFiles" Width="151" Click="btnJoinFiles_Click" Margin="10,0,0,0">Join MP3 Files</Button>
         </StackPanel>
 
         <!-- ListBox for MP3 Files with Drag and Drop Functionality -->
         <ListBox x:Name="mp3FileList" Grid.Row="1" Grid.Column="0" AllowDrop="True"
+                 Style="{DynamicResource MaterialDesignListBox}"
                  PreviewMouseMove="mp3FileList_PreviewMouseMove" 
                  DragEnter="mp3FileList_DragEnter"
                  DragOver="mp3FileList_DragOver" 
