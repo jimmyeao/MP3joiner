@@ -51,6 +51,7 @@ namespace MP3Joiner
             mp3FileList.Items.Clear();  // Clear MP3 list
             imgAlbumArt.Source = null;   // Clear album art image
             AlbumArtPlaceholder.Visibility = Visibility.Visible;  // Show "Drop Image Here" text again
+            AlbumArtBorder.Background = new SolidColorBrush(Colors.LightGray);
             txtTrackName.Clear();        // Clear track name
             txtArtistName.Clear();       // Clear artist name
            
@@ -423,5 +424,80 @@ namespace MP3Joiner
 
             e.Handled = true;
         }
+
+        private void btnreadidv3tag_Click(object sender, RoutedEventArgs e)
+        {
+            // Ensure a file is selected in the ListBox
+            if (mp3FileList.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a file to read ID3 tags.", "No File Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Ensure only one file is selected
+            if (mp3FileList.SelectedItems.Count > 1)
+            {
+                MessageBox.Show("Please select only one file to read ID3 tags.", "Multiple Files Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                // Get the selected file path
+                string selectedFile = mp3FileList.SelectedItem as string;
+
+                // Use TagLib to read the file's ID3 tags
+                var file = TagLib.File.Create(selectedFile);
+
+                // Check and set track name if available
+                if (!string.IsNullOrEmpty(file.Tag.Title))
+                {
+                    txtTrackName.Text = file.Tag.Title;
+                }
+                else
+                {
+                    txtTrackName.Clear(); // Clear if no track name found
+                }
+
+                // Check and set artist name if available
+                if (file.Tag.Performers.Length > 0)
+                {
+                    txtArtistName.Text = file.Tag.Performers[0];
+                }
+                else
+                {
+                    txtArtistName.Clear(); // Clear if no artist name found
+                }
+
+                // Set album art if available
+                if (file.Tag.Pictures.Length > 0)
+                {
+                    var picture = file.Tag.Pictures[0];
+                    using (var ms = new MemoryStream(picture.Data.Data))
+                    {
+                        BitmapImage albumArt = new BitmapImage();
+                        albumArt.BeginInit();
+                        albumArt.StreamSource = ms;
+                        albumArt.CacheOption = BitmapCacheOption.OnLoad;
+                        albumArt.EndInit();
+                        imgAlbumArt.Source = albumArt; // Set the album art in the Image control
+                        AlbumArtPlaceholder.Visibility = Visibility.Collapsed; // Hide the "Drop Image Here" text
+                    }
+                }
+                else
+                {
+                    imgAlbumArt.Source = null; // Clear if no album art found
+                    AlbumArtPlaceholder.Visibility = Visibility.Visible; // Show "Drop Image Here" if no image
+                }
+
+
+                MessageBox.Show("ID3 tags read successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading ID3 tags: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
     }
 }

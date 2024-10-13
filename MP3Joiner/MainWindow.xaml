@@ -25,20 +25,21 @@
         </Grid.ColumnDefinitions>
 
         <!-- Buttons for adding files -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0, 0, 0, 10">
-            <Button x:Name="btnAddFiles" Width="120" Click="btnAddFiles_Click">Add MP3 Files</Button>
-            <Button x:Name="btnClearFiles" Width="120" Click="btnClearFiles_Click" Margin="10,0,0,0">Clear List</Button>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,49,10" Grid.ColumnSpan="2">
+            <Button x:Name="btnAddFiles" Width="146" Click="btnAddFiles_Click">Add MP3 Files</Button>
+            <Button x:Name="btnClearFiles" Width="146" Click="btnClearFiles_Click" Margin="10,0,0,0">Clear List</Button>
             <!-- New button to join MP3 files -->
-            <Button x:Name="btnJoinFiles" Width="151" Click="btnJoinFiles_Click" Margin="10,0,0,0">Join MP3 Files</Button>
+            <Button x:Name="btnJoinFiles" Width="146" Click="btnJoinFiles_Click" Margin="10,0,0,0">Join MP3 Files</Button>
+            <Button x:Name="btnreadidv3tag" Width="146" Click="btnreadidv3tag_Click" Margin="10,0,0,0" Content="Read Id3 Tag"/>
         </StackPanel>
 
         <!-- ListBox for MP3 Files with Drag and Drop Functionality -->
-        <ListBox x:Name="mp3FileList" Grid.Row="1" Grid.Column="0" AllowDrop="True"
+        <ListBox x:Name="mp3FileList" Grid.Row="1" Grid.Column="0" AllowDrop="True" BorderThickness="1" BorderBrush="Black"
                  Style="{DynamicResource MaterialDesignListBox}"
                  PreviewMouseMove="mp3FileList_PreviewMouseMove" 
                  DragEnter="mp3FileList_DragEnter"
                  DragOver="mp3FileList_DragOver" 
-                 Drop="mp3FileList_Drop">
+                 Drop="mp3FileList_Drop" Background="#FFDEDEDE">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" />
@@ -47,30 +48,28 @@
         </ListBox>
 
         <!-- Album Art Drop Area -->
-        <Border x:Name="AlbumArtBorder" Grid.Row="1" Grid.Column="1" Background="LightGray" BorderThickness="1" BorderBrush="Black"
+        <Border x:Name="AlbumArtBorder" Grid.Row="1" Grid.Column="1" Background="LightGray" Margin="5,5,5,5" BorderThickness="0" BorderBrush="Black"
                 Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" AllowDrop="True"
                 DragEnter="AlbumArtBorder_DragEnter" Drop="AlbumArtBorder_Drop">
             <Grid>
                 <!-- Image to display the album art -->
-                <Image x:Name="imgAlbumArt" Stretch="Uniform" Width="200" Height="200" />
+                <Image x:Name="imgAlbumArt" Stretch="Uniform" Width="200" Height="200"/>
                 <!-- TextBlock visible initially and hidden after image drop -->
                 <TextBlock x:Name="AlbumArtPlaceholder" Text="Drop Image Here" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Foreground="Black" Background="Transparent" Opacity="0.7" />
+                           Foreground="Black" Background="Transparent" Opacity="0.7"/>
             </Grid>
         </Border>
 
         <!-- Metadata inputs (Artist, Track, etc.) -->
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Vertical" Margin="0, 10, 0, 0">
-            <TextBlock Text="Track Name:" />
-            <TextBox x:Name="txtTrackName" Width="400" />
+            <TextBlock Text="Track Name:" Width="87" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignBody1TextBlock}" />
+            <TextBox x:Name="txtTrackName" Width="400" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignTextBox}" />
 
-            <TextBlock Text="Artist Name:" Margin="0,10,0,0" />
-            <TextBox x:Name="txtArtistName" Width="400" />
-
-            <!-- Bitrate Selection -->
+            <TextBlock Text="Artist Name:" Margin="0,10,0,0" Width="92" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignBody1TextBlock}" />
+            <TextBox x:Name="txtArtistName" Width="400" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignTextBox}"/>
 
             <!-- Progress Bar -->
-            <ProgressBar x:Name="progressBar" Height="20" Margin="0, 20, 0, 0" Minimum="0" Maximum="100" />
+            <ProgressBar x:Name="progressBar" Height="20" Margin="0, 20, 0, 0" Minimum="0" Maximum="100" Style="{DynamicResource MaterialDesignLinearProgressBar}" />
         </StackPanel>
     </Grid>
 </Window>
