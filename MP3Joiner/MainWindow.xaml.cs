@@ -49,11 +49,11 @@ namespace MP3Joiner
         private void btnClearFiles_Click(object sender, RoutedEventArgs e)
         {
             mp3FileList.Items.Clear();  // Clear MP3 list
-            imgAlbumArt.Source = null;   // Clear album art image
+            //imgAlbumArt.Source = null;   // Clear album art image
             AlbumArtPlaceholder.Visibility = Visibility.Visible;  // Show "Drop Image Here" text again
             AlbumArtBorder.Background = new SolidColorBrush(Colors.LightGray);
-            txtTrackName.Clear();        // Clear track name
-            txtArtistName.Clear();       // Clear artist name
+            //txtTrackName.Clear();        // Clear track name
+            //txtArtistName.Clear();       // Clear artist name
            
             progressBar.Value = 0;       // Reset progress bar
         }
@@ -424,7 +424,19 @@ namespace MP3Joiner
 
             e.Handled = true;
         }
+        private void mp3FileList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && mp3FileList.SelectedItems.Count > 0)
+            {
+                // Collect selected items in a list to avoid modifying the collection during iteration
+                var itemsToRemove = mp3FileList.SelectedItems.Cast<object>().ToList();
 
+                foreach (var item in itemsToRemove)
+                {
+                    mp3FileList.Items.Remove(item);
+                }
+            }
+        }
         private void btnreadidv3tag_Click(object sender, RoutedEventArgs e)
         {
             // Ensure a file is selected in the ListBox

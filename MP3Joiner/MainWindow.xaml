@@ -39,7 +39,8 @@
                  PreviewMouseMove="mp3FileList_PreviewMouseMove" 
                  DragEnter="mp3FileList_DragEnter"
                  DragOver="mp3FileList_DragOver" 
-                 Drop="mp3FileList_Drop" Background="#FFDEDEDE">
+                 Drop="mp3FileList_Drop" 
+                 KeyDown="mp3FileList_KeyDown" Background="#FFDEDEDE">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" />
