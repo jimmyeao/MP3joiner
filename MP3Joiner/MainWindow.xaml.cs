@@ -50,7 +50,7 @@ namespace MP3Joiner
         {
             mp3FileList.Items.Clear();  // Clear MP3 list
             //imgAlbumArt.Source = null;   // Clear album art image
-            AlbumArtPlaceholder.Visibility = Visibility.Visible;  // Show "Drop Image Here" text again
+            //AlbumArtPlaceholder.Visibility = Visibility.Visible;  // Show "Drop Image Here" text again
             AlbumArtBorder.Background = new SolidColorBrush(Colors.LightGray);
             //txtTrackName.Clear();        // Clear track name
             //txtArtistName.Clear();       // Clear artist name
@@ -437,6 +437,19 @@ namespace MP3Joiner
                 }
             }
         }
+        private void btnClearPic_Click(object sender, RoutedEventArgs e)
+        {
+            imgAlbumArt.Source = null; // Clear the image
+            AlbumArtPlaceholder.Visibility = Visibility.Visible; // Show the placeholder
+        }
+
+
+        private void btnClearText_Click(object sender, RoutedEventArgs e)
+        {
+            txtTrackName.Text = string.Empty; // Clears the Track Name textbox
+            txtArtistName.Text = string.Empty; // Clears the Artist Name textbox
+        }
+
         private void btnreadidv3tag_Click(object sender, RoutedEventArgs e)
         {
             // Ensure a file is selected in the ListBox
