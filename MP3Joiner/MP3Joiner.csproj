@@ -6,9 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>logo (1).ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <PackageIcon>logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/jimmyeao/MP3joiner</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jimmyeao/MP3joiner</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.1</FileVersion>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,6 +64,12 @@
 
   <ItemGroup>
     <None Remove="C:\Users\jimmy\.nuget\packages\naudio.lame\2.1.0\build\libmp3lame.32.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

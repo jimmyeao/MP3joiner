@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+
 using System.Linq;
 using System.Windows.Documents;
 using NAudio.Lame;
@@ -22,6 +23,7 @@ namespace MP3Joiner
         {
             InitializeComponent();
             SetDisplayIcon();
+            IconHandler.AddIconToRemovePrograms("MP3 Joiner");
         }
 
         // Add MP3 Files
@@ -524,5 +526,46 @@ namespace MP3Joiner
             }
         }
 
+    }
+    static class IconHandler
+    {
+        static string IconPath => Path.Combine(AppContext.BaseDirectory, "icon.ico");
+
+        public static void AddIconToRemovePrograms(string productName)
+        {
+            try
+            {
+                // Ensure the icon exists
+                if (File.Exists(IconPath))
+                {
+                    // Open the Uninstall registry key
+                    var uninstallKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall", writable: true);
+                    if (uninstallKey != null)
+                    {
+                        foreach (var subKeyName in uninstallKey.GetSubKeyNames())
+                        {
+                            using (var subKey = uninstallKey.OpenSubKey(subKeyName, writable: true))
+                            {
+                                if (subKey == null) continue;
+
+                                // Check the display name of the application
+                                var displayName = subKey.GetValue("DisplayName") as string;
+                                if (string.Equals(displayName, productName, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // Set the DisplayIcon value
+                                    subKey.SetValue("DisplayIcon", IconPath);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle errors gracefully
+                Console.WriteLine($"Error setting uninstall icon: {ex.Message}");
+            }
+        }
     }
 }
